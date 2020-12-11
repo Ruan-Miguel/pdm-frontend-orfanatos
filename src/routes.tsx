@@ -21,7 +21,7 @@ const Routes = () => {
           component={OrphanageDetails}
           options={{
             headerShown: true,
-            header: () => <Header title='Informe os dados' showX={false} />
+            header: () => <Header title='Orfanato' showX={false} />
           }}
         ></Screen>
         <Screen

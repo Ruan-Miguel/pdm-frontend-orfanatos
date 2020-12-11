@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import { BorderlessButton } from "react-native-gesture-handler";
+import { useNavigation } from "@react-navigation/native";
 import { Feather } from "@expo/vector-icons";
 
 interface HeaderProps {
@@ -9,18 +10,25 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({title, showX = true}) => {
+  const navigation = useNavigation();
+
+  const goToOrphanagesMap = () => {
+    navigation.navigate('OrphanagesMap');
+  }
+  
   return (
     <View style={styles.container}>
-      <BorderlessButton>
+      <BorderlessButton onPress={navigation.goBack}>
         <Feather name='arrow-left' size={24} color='#15b6d6' />
       </BorderlessButton>
-      <Text  style={styles.title}>{title}</Text>
-      {showX &&
+      <Text style={styles.title}>{title}</Text>
+      {showX ?
         (
-          <BorderlessButton>
+          <BorderlessButton onPress={goToOrphanagesMap}>
             <Feather name='x' size={24} color='#ff669d' />
           </BorderlessButton>
         )
+        : <View />
       }
     </View>
   );
