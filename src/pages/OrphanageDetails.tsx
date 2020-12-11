@@ -1,8 +1,12 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, Text } from 'react-native';
 
 const OrphanageDetails = () => {
-  return <View />;
+  return (
+    <View>
+      <Text>Detalhes do orfanato</Text>
+    </View>
+  );
 };
 
 export default OrphanageDetails;
