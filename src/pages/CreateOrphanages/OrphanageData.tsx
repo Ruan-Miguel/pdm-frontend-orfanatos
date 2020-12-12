@@ -49,6 +49,8 @@ const OrphanageData = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    marginHorizontal: 12,
+    marginBottom: 12,
   },
   title: {
     color: '#5c8599',
@@ -99,6 +101,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: 56,
     marginTop: 32,
+    marginBottom: 12,
   },
   nextButtonText: {
     fontFamily: 'Nunito_800ExtraBold',

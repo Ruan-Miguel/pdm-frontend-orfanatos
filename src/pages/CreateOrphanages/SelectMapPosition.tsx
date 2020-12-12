@@ -31,7 +31,7 @@ const SelectMapPosition = () => {
             longitude: -38.4155765,
           }}
           calloutAnchor={{ x: 2.7, y: .8 }}
-        ></Marker>
+        />
       </MapView>
       <RectButton style={styles.nextButton} onPress={goToOrphanageData}>
         <Text style={styles.nextButtonText}>Próximo</Text>
