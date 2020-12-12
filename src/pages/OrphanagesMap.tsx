@@ -29,8 +29,8 @@ const Orphanagesmap = () => {
 
   const navigation = useNavigation();
 
-  const navigateToOrphanageDetails = () => {
-    navigation.navigate('OrphanageDetails');
+  const navigateToOrphanageDetails = (id: number) => () => {
+    navigation.navigate('OrphanageDetails', { id });
   }
 
   const navigateToCreateOrphanage = () => {
@@ -61,7 +61,7 @@ const Orphanagesmap = () => {
           >
             <Callout
               tooltip={true}
-              onPress={navigateToOrphanageDetails}
+              onPress={navigateToOrphanageDetails(orphanage.id)}
             >
               <View style={styles.calloutContainer}>
                 <Text style={styles.calloutText}>{orphanage.name}</Text>

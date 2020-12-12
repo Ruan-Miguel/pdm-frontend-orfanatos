@@ -1,36 +1,80 @@
-import React from 'react';
-import { ScrollView, View, Image, Text, StyleSheet, Dimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { ScrollView, View, Image, Text, TouchableOpacity, StyleSheet, Dimensions, Linking } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 import MapView, { Marker } from "react-native-maps";
 import { Feather, FontAwesome } from "@expo/vector-icons";
+import { useRoute } from "@react-navigation/native";
+
+import api from "../services/api";
 
 import mapMarker from "../images/map-marker.png";
+import { AppLoading } from 'expo';
+
+interface ParamsId {
+  id: number;
+}
+
+interface ImageUrl {
+  id: number;
+  url: string;
+}
+
+interface Orphanage {
+  id: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  about: string;
+  instructions: string;
+  openingHours: string;
+  openOnWeekends: boolean;
+  images: ImageUrl[];
+}
 
 const OrphanageDetails = () => {
+  const route = useRoute();
+  const paramsId = route.params as ParamsId;
+
+  const [orphanage, setOrphanage] = useState<Orphanage>();
+
+  const goToGoogleMapsRoute = () => {
+    Linking.openURL(`https://google.com/maps/dir/?api=1&destination=${orphanage?.latitude},${orphanage?.longitude}`);
+  }
+
+  useEffect(() => {
+    api.get(`/orphanage/${paramsId.id}`).then((res) => {
+      setOrphanage(res.data);
+      console.log(res.data)
+    })
+  }, [paramsId.id])
+
+  if (!orphanage) {
+    return <AppLoading />;
+  }
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.imagesContainer}>
         <ScrollView horizontal pagingEnabled>
-          <Image
-            style={styles.image}
-            source={{ uri: 'https://fmnova.com.br/images/noticias/safe_image.jpg' }}
-          />
-          <Image
-            style={styles.image}
-            source={{ uri: 'https://fmnova.com.br/images/noticias/safe_image.jpg' }}
-          />
+          {orphanage.images.map((image) => (
+            <Image
+              key={image.id}
+              source={{ uri: image.url }}
+              style={styles.image}
+            />
+          ))}
         </ScrollView>
       </View>
       <View style={styles.detailOrphanageContainer}>
-        <Text style={styles.title}>Lar dos Idosos</Text>
-        <Text style={styles.description}>Presta atenção para Idosos</Text>
+        <Text style={styles.title}>{orphanage.name}</Text>
+        <Text style={styles.description}>{orphanage.about}</Text>
 
         <View style={styles.mapContainer}>
           <MapView
             style={styles.mapStyle}
             initialRegion={{
-              latitude: -6.5205485,
-              longitude: -38.4155765,
+              latitude: orphanage.latitude,
+              longitude: orphanage.longitude,
               latitudeDelta: 0.008,
               longitudeDelta: 0.008,
             }}
@@ -42,15 +86,15 @@ const OrphanageDetails = () => {
             <Marker
               icon={mapMarker}
               coordinate={{
-                latitude: -6.5205485,
-                longitude: -38.4155765,
+                latitude: orphanage.latitude,
+                longitude: orphanage.longitude,
               }}
             ></Marker>
           </MapView>
 
-          <View style={styles.routesContainer}>
+          <TouchableOpacity onPress={goToGoogleMapsRoute} style={styles.routesContainer}>
             <Text style={styles.routesText}>Ver rotas no goole maps</Text>
-          </View>
+          </TouchableOpacity>
         </View>
 
       </View>
@@ -58,17 +102,26 @@ const OrphanageDetails = () => {
       <View style={styles.separator} />
 
       <Text style={styles.title}>Instruções para visitar</Text>
-      <Text style={styles.description}>Venha visitar porque tem muitos idosos queridos</Text>
+      <Text style={styles.description}>{orphanage.instructions}</Text>
 
       <View style={styles.scheduleContainer}>
         <View style={[styles.scheduleItem, styles.scheduleItemBlue]}>
           <Feather name='clock' size={40} color='#2ab5d1' />
-          <Text style={[styles.scheduleItemText, styles.scheduleItemTextBlue]}>Segunda à sexta 08h às 18h</Text>
+          <Text style={[styles.scheduleItemText, styles.scheduleItemTextBlue]}>Segunda à sexta {orphanage.openingHours}</Text>
         </View>
-        <View style={[styles.scheduleItem, styles.scheduleItemGreen]}>
-          <Feather name='clock' size={40} color='#2ab5d1' />
-          <Text style={[styles.scheduleItemText, styles.scheduleItemTextGreen]}>Atendemos no final de semana</Text>
-        </View>
+        {orphanage.openOnWeekends ?
+        (
+          <View style={[styles.scheduleItem, styles.scheduleItemGreen]}>
+            <Feather name='clock' size={40} color='#2ab5d1' />
+            <Text style={[styles.scheduleItemText, styles.scheduleItemTextGreen]}>Atendemos no final de semana</Text>
+          </View>
+        )
+        : (
+          <View style={[styles.scheduleItem, styles.scheduleItemRed]}>
+            <Feather name='clock' size={40} color='#ff669d' />
+            <Text style={[styles.scheduleItemText, styles.scheduleItemTextRed]}>Atendemos no final de semana</Text>
+          </View>
+        )}
       </View>
 
       <RectButton style={styles.contactButton} onPress={() => {}}>
@@ -155,6 +208,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#edfff6',
     borderColor: '#a1e9c5',
   },
+  scheduleItemRed: {
+    backgroundColor: '#f3f6f9',
+    borderColor: '#ffbcd4',
+  },
   scheduleItemText: {
     fontFamily: 'Nunito_600SemiBold',
     fontSize: 16,
@@ -166,6 +223,9 @@ const styles = StyleSheet.create({
   },
   scheduleItemTextGreen: {
     color: '#37c77f',
+  },
+  scheduleItemTextRed: {
+    color: '#ff669d',
   },
   contactButton: {
     backgroundColor: '#3cdc8c',
